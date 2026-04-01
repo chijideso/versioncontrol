@@ -53,7 +53,7 @@ export default function Dashboard() {
   return (
     <Container size="sm">
       <Stack>
-        <Title order={2}>Your Feed</Title>
+        <Title order={2}>Your Feeds</Title>
         
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Textarea 
