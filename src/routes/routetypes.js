@@ -1,7 +1,6 @@
-
-
-export const approutes =  {
-  APP: '/app',
-  HOME: '/home',
-  ABOUT: '/about'
-}
+export const ROUTES = {
+  LOGIN: '/login',
+  DASHBOARD: '/',
+  NOTIFICATIONS: '/notifications',
+  SETTINGS: '/settings',
+};
