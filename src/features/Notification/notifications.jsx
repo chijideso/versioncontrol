@@ -1,12 +1,15 @@
-import { Title, Text, Paper, Stack } from '@mantine/core';
+import { Title, Text, Container, Stack, Paper } from '@mantine/core';
 
 export default function Notification() {
   return (
-    <Stack>
-      <Title order={2}>Notifications</Title>
-      <Paper withBorder p="md" radius="md">
-        <Text size="sm">You have no new notifications at this time.</Text>
-      </Paper>
-    </Stack>
+    <Container size="sm" py="xl">
+      <Title order={2} mb="lg">Notifications</Title>
+      <Stack>
+        <Paper withBorder p="md" radius="md">
+          <Text fw={500}>Welcome to SocialApp!</Text>
+          <Text size="sm" c="dimmed">You have successfully set up your account.</Text>
+        </Paper>
+      </Stack>
+    </Container>
   );
 }

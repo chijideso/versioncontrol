@@ -1,13 +1,16 @@
 import { AppShell, Burger, NavLink, Group, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'; // Keep this one
 import { IconHome2, IconBell, IconSettings, IconLogout } from '@tabler/icons-react';
 import { ROUTES } from '../../routes/routeTypes';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+// I deleted the duplicate 'import { useNavigate }' from here
 
 export default function AppLayout() {
   const [opened, { toggle }] = useDisclosure();
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   const data = [
     { icon: IconHome2, label: 'Feed', path: ROUTES.DASHBOARD },
@@ -24,7 +27,7 @@ export default function AppLayout() {
       <AppShell.Header>
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Title order={3} c="blue">SocialConnect</Title>
+<Title order={3}>SocialConnect</Title>
         </Group>
       </AppShell.Header>
 
@@ -35,14 +38,18 @@ export default function AppLayout() {
             label={item.label}
             leftSection={<item.icon size="1rem" stroke={1.5} />}
             active={location.pathname === item.path}
-            onClick={() => navigate(item.path)}
+            onClick={() => {
+              navigate(item.path);
+              if (opened) toggle(); // Closes mobile menu on click
+            }}
           />
         ))}
         <NavLink
           label="Logout"
           leftSection={<IconLogout size="1rem" stroke={1.5} />}
-          onClick={() => navigate(ROUTES.LOGIN)}
+          onClick={logout}
           color="red"
+          variant="subtle"
           mt="auto"
         />
       </AppShell.Navbar>
