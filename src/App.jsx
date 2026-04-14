@@ -1,49 +1,64 @@
-import { MantineProvider, createTheme } from '@mantine/core';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { MantineProvider, ColorSchemeScript } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import '@mantine/notifications/styles.css';
-import { AuthProvider } from './contexts/AuthContext.jsx';
-import AppRoutes from './routes/approutes.jsx';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-const theme = createTheme({
-  primaryColor: 'indigo',
-  primaryShade: { light: 6, dark: 6 },
-  colors: {
-    'socialIndigo': ['#eef2ff', '#e0e7ff', '#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1', '#4f46e5', '#4338ca', '#3730a3', '#312e81'],
-    'socialOrange': ['#fff7ed', '#ffedd5', '#fed7aa', '#fdba74', '#fb923c', '#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12'],
-    'socialTeal': ['#f0fdfa', '#ccfbf1', '#99f6e4', '#5eead4', '#2dd4bf', '#14b8a6', '#0d9488', '#0f766e', '#115e59', '#134e4a'],
-  },
-  defaultRadius: 'lg', // Increased to 'lg' for a softer, more modern social look
-  components: {
-    Button: {
-      styles: (theme) => ({
-        root: {
-          // Fixed the gradient syntax for CSS
-          backgroundImage: 'linear-gradient(135deg, var(--mantine-color-indigo-6) 0%, var(--mantine-color-violet-6) 100%)',
-          transition: 'transform 150ms ease',
-          '&:active': { transform: 'scale(0.98)' },
-        }
-      })
-    },
-    Card: {
-      defaultProps: {
-        shadow: 'xl', // Stronger shadow for depth
-        padding: 'lg',
-        withBorder: true,
-      }
-    }
-  }
-});
+import AppLayout from './features/Applayout/applayout';
+import Login from './features/Auth/login';
+import Register from './features/Auth/register';
+import Dashboard from './features/Dashboard/dashboard';
+import Notification from './features/Notification/notifications';
+import Messages from './features/Messages/messages';
+import Hashtags from './features/Hashtags/hashtags';
+import Profile from './features/profile/profile';
+import { ROUTES } from './routes/routeTypes';
 
-function App() {
+// 1. Guard for pages that require a login
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to={ROUTES.LOGIN} replace />;
+}
+
+// 2. The routing logic
+function AppRoutes() {
+  const { user } = useAuth();
+
   return (
-    // Only one provider is needed here with your custom theme
-    <MantineProvider theme={theme} defaultColorScheme="light">
-      <Notifications position="top-right" zIndex={1000} />
+    <Routes>
+      {/* Public: Redirect to Dashboard if already logged in */}
+      <Route 
+        path={ROUTES.LOGIN} 
+        element={!user ? <Login /> : <Navigate to={ROUTES.DASHBOARD} replace />} 
+      />
+      <Route 
+        path={ROUTES.REGISTER} 
+        element={!user ? <Register /> : <Navigate to={ROUTES.DASHBOARD} replace />} 
+      />
+
+      {/* Protected: All these share the AppLayout (Sidebar/Header) */}
+      <Route path="/" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route index element={<Dashboard />} />
+        <Route path="notifications" element={<Notification />} />
+        <Route path="messages" element={<Messages />} />
+        <Route path="hashtags" element={<Hashtags />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="settings" element={<div>Settings coming soon</div>} />
+      </Route>
+
+      {/* Fallback: Send strangers to Login */}
+      <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
+    </Routes>
+  );
+}
+
+// 3. The Root Component (NO BrowserRouter here!)
+export default function App() {
+  return (
+    <MantineProvider>
+      <Notifications />
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
     </MantineProvider>
   );
 }
-
-export default App;
